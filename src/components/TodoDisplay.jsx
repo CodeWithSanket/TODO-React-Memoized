@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import Button from "./Button";
 import TodoListItem from "./TodoListITem";
 import Input from './Input'
@@ -17,19 +17,30 @@ export default function TodoDisplay() {
     }
 
     function onButtonClick() {
-        if (inputVal.length != 0) {
-            setList([...list, inputVal]);
+        if (inputVal) {
+            setList([...list, { id: list.length + 1, value: inputVal }])
             setInputVal('');
         }
     }
+
+
+
+    function onDelete() {
+        console.log("Button Clicked");
+    }
+
+    const memoizedDeleteComponent = useCallback(onDelete, []);
+    const memoizedList = useMemo(() => {
+        return list;
+    }, [list]);
 
     return (
         <>
             <Input type={"text"} value={inputVal} placeholder={"Enter Your Todo..."} onChangeHandler={onChangeHandler} />
             <Button type={"click"} text={"Submit"} onButtonClick={onButtonClick} />
-            {list.map((listItem, index) => {
+            {memoizedList.map((listItem) => {
                 return (
-                    <MemoizedComponent key={index} listItem={listItem} />
+                    <MemoizedComponent key={listItem.id} listItemVal={listItem.value} onDelete={memoizedDeleteComponent} />
                 )
             })}
         </>
